@@ -74,9 +74,21 @@
 			<artifactId>postgresql</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+		<dependency>
+  			<groupId>com.auth0</groupId>
+  			<artifactId>java-jwt</artifactId>
+  			<version>4.5.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>
+		<resources>
+      		<resource>
+        		<directory>src/main/resources</directory>
+        		<!-- disable filtering for properties if they contain non-UTF8 or binary-like bytes -->
+        		<filtering>false</filtering>
+      		</resource>
+    	</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
