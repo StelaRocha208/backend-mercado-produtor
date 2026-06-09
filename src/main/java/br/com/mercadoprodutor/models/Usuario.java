@@ -8,6 +8,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -21,7 +23,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Usuario implements UserDetails{
+public class Usuario implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
@@ -29,21 +32,36 @@ public class Usuario implements UserDetails{
     private String email;
     private String senha;
     private String statusAcesso;
-    private PerfilUsuario perfis;
+
+    @Enumerated(EnumType.ORDINAL)
+private PerfilUsuario perfis;
+
     private String perfilAtivo;
 
-    public Usuario(String email, String senha, PerfilUsuario perfil){
+    // Construtor já utilizado pelo AuthenticationController
+    public Usuario(String email, String senha, PerfilUsuario perfil) {
         this.email = email;
         this.senha = senha;
         this.perfis = perfil;
     }
 
+    // Novo construtor para o CRUD de usuários
+    public Usuario(String nome, String email, String senha, PerfilUsuario perfil) {
+        this.nome = nome;
+        this.email = email;
+        this.senha = senha;
+        this.perfis = perfil;
+        this.statusAcesso = "ATIVO";
+        this.perfilAtivo = perfil.name();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        //to do: Implementar para todos os tipos de Perfis ex: comprador, operador, produtor;
-        if(this.perfis == PerfilUsuario.ADMINISTRADOR) return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        else return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        if (this.perfis == PerfilUsuario.ADMINISTRADOR) {
+            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        }
+
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override
@@ -55,5 +73,4 @@ public class Usuario implements UserDetails{
     public String getUsername() {
         return email;
     }
-    
 }
