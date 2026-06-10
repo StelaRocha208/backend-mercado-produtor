@@ -6,6 +6,8 @@ public record UsuarioCreateDTO(
         String nome,
         String email,
         String senha,
-        PerfilUsuario perfil
+        PerfilUsuario perfil,
+        String cpf,
+        String telefone
 ) {
 }
