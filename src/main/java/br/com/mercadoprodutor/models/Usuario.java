@@ -34,7 +34,7 @@ public class Usuario implements UserDetails {
     private String statusAcesso;
 
     @Enumerated(EnumType.ORDINAL)
-private PerfilUsuario perfis;
+    private PerfilUsuario perfis;
 
     private String perfilAtivo;
 

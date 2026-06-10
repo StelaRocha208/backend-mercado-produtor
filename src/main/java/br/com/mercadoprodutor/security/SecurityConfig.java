@@ -26,6 +26,7 @@ public class SecurityConfig {
 
         return http
             .csrf(csrf -> csrf.disable())
+            .cors(cors -> cors.configure(http))
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
@@ -36,6 +37,8 @@ public class SecurityConfig {
                 // Endpoints da Sprint 2
                 .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/usuarios").permitAll()
+
+                .requestMatchers("/error").permitAll()
 
                 .anyRequest().authenticated()
             )
