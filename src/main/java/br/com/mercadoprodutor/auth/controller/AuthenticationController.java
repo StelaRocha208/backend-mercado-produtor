@@ -1,5 +1,6 @@
 package br.com.mercadoprodutor.auth.controller;
 
+import br.com.mercadoprodutor.usuarios.service.IUsuarioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +20,7 @@ public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
     private final TokenService tokenService;
+    private final IUsuarioService usuarioService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid AuthenticationDTO data) {
