@@ -2,6 +2,7 @@ package br.com.mercadoprodutor.usuarios.service;
 
 import java.util.List;
 
+import br.com.mercadoprodutor.audit.aspect.AuditarAcao;
 import br.com.mercadoprodutor.core.exception.RegraNegocioException;
 import br.com.mercadoprodutor.usuarios.dto.UsuarioUpdateDTO;
 import br.com.mercadoprodutor.usuarios.model.PerfilUsuario;
@@ -27,6 +28,7 @@ public class UsuarioService implements IUsuarioService {
 
     @Override
     @Transactional
+    @AuditarAcao(valor = "Usuario Criado") //Anotação custom de auditoria
     public UsuarioResponseDTO criarUsuario(UsuarioCreateDTO dto) {
 
         Usuario usuarioLogado = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -48,6 +50,7 @@ public class UsuarioService implements IUsuarioService {
 
     @Override
     @Transactional
+    @AuditarAcao(valor = "Alteração de Cadastro de Usuário")
     public UsuarioResponseDTO editarUsuario(String id, UsuarioUpdateDTO dto) {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado."));

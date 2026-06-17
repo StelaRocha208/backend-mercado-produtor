@@ -38,7 +38,7 @@ public class SecurityConfig {
 
                         // Liberação temporária para testes do GET no painel administrativo
                         .requestMatchers(HttpMethod.GET, "/api/usuarios").permitAll()
-
+                        .requestMatchers(HttpMethod.GET, "/api/audit").permitAll()
                         // LIBERAÇÃO TEMPORÁRIA DA PORTARIA
                         .requestMatchers(HttpMethod.POST, "/portaria/entrada").permitAll()
 
