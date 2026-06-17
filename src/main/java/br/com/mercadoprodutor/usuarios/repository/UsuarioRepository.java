@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.userdetails.UserDetails;
 import br.com.mercadoprodutor.usuarios.model.Usuario;
+import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, String> {
 
@@ -25,4 +26,11 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
             "(:busca IS NULL OR LOWER(u.nome) LIKE LOWER(CONCAT('%', :busca, '%')) " +
             "OR LOWER(u.email) LIKE LOWER(CONCAT('%', :busca, '%')))")
     Page<Usuario> buscarComFiltro(@Param("busca") String busca, Pageable pageable);
+
+    // Query utilizada pela redefinição de e-mail para buscar um usuário sem disparar a exceção de segurança do login
+    @Query("SELECT u FROM Usuario u " +
+            "LEFT JOIN Produtor p ON p.usuario = u " +
+            "LEFT JOIN Comprador c ON c.usuario = u " +
+            "WHERE u.email = :login OR p.cpf = :login OR c.cpf = :login")
+    Optional<Usuario> findUsuarioOptionalByEmailOrCpf(@Param("login") String login);
 }
