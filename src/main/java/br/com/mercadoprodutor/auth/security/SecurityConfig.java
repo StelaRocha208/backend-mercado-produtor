@@ -50,7 +50,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/espacos").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/espacos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/ocupacao/**").permitAll()
-                        
+
 
 
                         // Liberação temporária para testes do mapa
