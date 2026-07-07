@@ -6,30 +6,37 @@ import br.com.mercadoprodutor.portaria.model.Registro;
 import br.com.mercadoprodutor.portaria.model.StatusRegistro;
 
 public record RegistroResponseDTO(
+
         String id,
-        String produtorId,
+        String usuarioId,
+        String nome,
+        String perfil,
         String veiculoId,
-        String secao,
-        String espaco,
-        String numeroNF,
-        String observacao,
+        String placa,
         LocalDateTime dataEntrada,
         LocalDateTime dataSaida,
         StatusRegistro statusRegistro
+
 ) {
 
-    public RegistroResponseDTO(Registro registro) {
+    public RegistroResponseDTO(
+            Registro registro,
+            String perfil
+    ) {
+
         this(
+
                 registro.getId(),
-                registro.getProdutor().getId(),
+                registro.getProdutor().getUsuario().getId(),
+                registro.getProdutor().getUsuario().getNome(),
+                perfil,
                 registro.getVeiculo().getId(),
-                registro.getSecao(),
-                registro.getEspaco(),
-                registro.getNumeroNF(),
-                registro.getObservacao(),
+                registro.getVeiculo().getPlaca(),
                 registro.getDataEntrada(),
                 registro.getDataSaida(),
                 registro.getStatusRegistro()
+
         );
     }
+
 }

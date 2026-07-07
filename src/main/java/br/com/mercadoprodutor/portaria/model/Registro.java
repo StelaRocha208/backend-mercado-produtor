@@ -34,16 +34,24 @@ public class Registro extends BaseEntity {
     @Column(name = "status_registro", nullable = false)
     private StatusRegistro statusRegistro;
 
+    /*
+     * TODO
+     * Estes campos serão migrados para a entidade Reserva
+     * quando o módulo de Reserva de Espaço for implementado.
+     * Permanecem temporariamente para manter compatibilidade
+     * com a estrutura atual do banco de dados.
+     */
+
     @Column(name = "numero_nf")
     private String numeroNF;
 
     @Column(length = 500)
     private String observacao;
 
-    @Column(nullable = false)
+    @Column
     private String secao;
 
-    @Column(nullable = false)
+    @Column
     private String espaco;
 
     @ManyToOne(fetch = FetchType.LAZY)
