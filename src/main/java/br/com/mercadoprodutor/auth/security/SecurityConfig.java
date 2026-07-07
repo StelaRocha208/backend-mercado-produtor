@@ -43,6 +43,7 @@ public class SecurityConfig {
                         // LIBERAÇÃO TEMPORÁRIA DA PORTARIA
                         .requestMatchers(HttpMethod.GET, "/portaria/busca").permitAll()
                         .requestMatchers(HttpMethod.POST, "/portaria/entrada").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/portaria/saida").permitAll()
 
                         // Rotas de configuração para redefinição de senha
                         .requestMatchers(HttpMethod.POST, "/auth/esqueci-senha").permitAll()

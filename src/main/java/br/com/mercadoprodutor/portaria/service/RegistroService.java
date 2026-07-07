@@ -12,6 +12,7 @@ import br.com.mercadoprodutor.core.exception.RegraNegocioException;
 import br.com.mercadoprodutor.portaria.dto.BuscaPortariaResponseDTO;
 import br.com.mercadoprodutor.portaria.dto.RegistroEntradaDTO;
 import br.com.mercadoprodutor.portaria.dto.RegistroResponseDTO;
+import br.com.mercadoprodutor.portaria.dto.RegistroSaidaDTO;
 import br.com.mercadoprodutor.portaria.dto.VeiculoPortariaDTO;
 import br.com.mercadoprodutor.portaria.model.Registro;
 import br.com.mercadoprodutor.portaria.model.StatusRegistro;
@@ -35,7 +36,6 @@ public class RegistroService implements IRegistroService {
     @Transactional(readOnly = true)
     public BuscaPortariaResponseDTO buscarUsuario(String valor) {
 
-        // Busca por CPF
         if (valor.matches("\\d{11}")) {
 
             Produtor produtor = produtorRepository.findByCpf(valor).orElse(null);
@@ -53,7 +53,6 @@ public class RegistroService implements IRegistroService {
             throw new RegraNegocioException("Usuário não encontrado.");
         }
 
-        // Busca por placa
         Veiculo veiculo = veiculoRepository.findByPlaca(valor)
                 .orElseThrow(() ->
                         new RegraNegocioException("Veículo não encontrado."));
@@ -65,9 +64,6 @@ public class RegistroService implements IRegistroService {
     @Transactional
     public RegistroResponseDTO registrarEntrada(RegistroEntradaDTO dto) {
 
-        // Nesta sprint o registro de entrada está preparado apenas para PRODUTOR.
-        // O fluxo de Comprador e Reserva será concluído quando o módulo de
-        // Reserva estiver implementado.
         if (!"PRODUTOR".equalsIgnoreCase(dto.perfil())) {
             throw new RegraNegocioException(
                     "No momento o registro de entrada está disponível apenas para produtores.");
@@ -81,13 +77,11 @@ public class RegistroService implements IRegistroService {
                 .orElseThrow(() ->
                         new RegraNegocioException("Veículo não encontrado."));
 
-        // Verifica se o veículo pertence ao produtor selecionado
         if (!veiculo.getProdutor().getId().equals(produtor.getId())) {
             throw new RegraNegocioException(
                     "O veículo informado não pertence ao produtor selecionado.");
         }
 
-        // Não permite dois registros em andamento
         registroRepository
                 .findByProdutorIdAndStatusRegistro(
                         produtor.getId(),
@@ -108,21 +102,41 @@ public class RegistroService implements IRegistroService {
 
         /*
          * TODO
-         * Quando o módulo de Reserva estiver implementado,
-         * o Registro receberá a Reserva vinculada.
-         *
-         * Também voltarão a ser preenchidos:
-         * - Seção
-         * - Espaço
-         * - Nota Fiscal
+         * Quando o módulo Reserva estiver implementado,
+         * o Registro será vinculado à Reserva.
          */
 
         registro = registroRepository.save(registro);
 
         return new RegistroResponseDTO(
-        registro,
-        produtor.getUsuario().getPerfis().name()
-);
+                registro,
+                produtor.getUsuario().getPerfis().name()
+        );
+    }
+
+    @Override
+    @Transactional
+    public RegistroResponseDTO registrarSaida(RegistroSaidaDTO dto) {
+
+        Registro registro = registroRepository.findById(dto.registroId())
+                .orElseThrow(() ->
+                        new RegraNegocioException("Registro não encontrado."));
+
+        if (registro.getStatusRegistro() == StatusRegistro.ENCERRADO) {
+            throw new RegraNegocioException(
+                    "Este registro já foi encerrado.");
+        }
+
+        registro.setDataSaida(LocalDateTime.now());
+
+        registro.setStatusRegistro(StatusRegistro.ENCERRADO);
+
+        registro = registroRepository.save(registro);
+
+        return new RegistroResponseDTO(
+                registro,
+                registro.getProdutor().getUsuario().getPerfis().name()
+        );
     }
 
     private BuscaPortariaResponseDTO montarRespostaProdutor(Produtor produtor) {
@@ -159,4 +173,5 @@ public class RegistroService implements IRegistroService {
                 List.of()
         );
     }
+
 }

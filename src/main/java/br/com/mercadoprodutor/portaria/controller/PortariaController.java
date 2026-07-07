@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import br.com.mercadoprodutor.portaria.dto.BuscaPortariaResponseDTO;
 import br.com.mercadoprodutor.portaria.dto.RegistroEntradaDTO;
 import br.com.mercadoprodutor.portaria.dto.RegistroResponseDTO;
+import br.com.mercadoprodutor.portaria.dto.RegistroSaidaDTO;
 import br.com.mercadoprodutor.portaria.service.IRegistroService;
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +37,16 @@ public class PortariaController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(registro);
+    }
+
+    @PostMapping("/saida")
+    public ResponseEntity<RegistroResponseDTO> registrarSaida(
+            @RequestBody RegistroSaidaDTO dto) {
+
+        RegistroResponseDTO registro =
+                registroService.registrarSaida(dto);
+
+        return ResponseEntity.ok(registro);
     }
 
 }
