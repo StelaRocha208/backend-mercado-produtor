@@ -8,15 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface EspacoRepository extends JpaRepository<Espaco, String> {
 
     boolean existsBySecaoAndNumero(Secao secao, String numero);
-
-    Optional<Espaco> findBySecaoAndNumero(Secao secao, String numero);
-
-    List<Espaco> findBySecao(Secao secao);
 
     @Query("""
         select e

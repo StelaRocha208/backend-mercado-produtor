@@ -23,25 +23,22 @@ public class EspacoController {
 
     @GetMapping("/secoes")
     public ResponseEntity<List<SecaoResponse>> listarSecoes() {
-        return ResponseEntity.ok(espacoService.listarSecoes());
+        return ResponseEntity.ok(List.of());
     }
 
     @GetMapping("/espacos")
     public ResponseEntity<List<EspacoResponse>> listarEspacos(
         @RequestParam(required = false) TipoSecao secao
     ) {
-        return ResponseEntity.ok(espacoService.listarEspacos(secao));
+        return ResponseEntity.ok(espacoService.listarEspacos(secao, null, null));
     }
 
     @GetMapping("/ocupacao/mapa")
     public ResponseEntity<List<EspacoResponse>> obterMapaOcupacao(
         @RequestParam(required = false) TipoSecao secao
     ) {
-        return ResponseEntity.ok(espacoService.listarEspacos(secao));
+        return ResponseEntity.ok(espacoService.listarEspacos(secao, null, null));
     }
 
-    @GetMapping("/ocupacao/resumo")
-    public ResponseEntity<List<OcupacaoResumoResponse>> obterResumoOcupacao() {
-        return ResponseEntity.ok(espacoService.obterResumoOcupacao());
-    }
+
 }

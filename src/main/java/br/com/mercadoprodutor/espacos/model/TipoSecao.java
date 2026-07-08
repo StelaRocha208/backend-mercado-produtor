@@ -4,5 +4,4 @@ public enum TipoSecao {
     PEDRA,
     BOX,
     VOLANTE,
-    ESTACIONAMENTO
 }

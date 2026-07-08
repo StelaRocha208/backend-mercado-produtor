@@ -48,7 +48,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/espacos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/ocupacao/**").permitAll()
                         
-
+                        //Lineracao de reservas para testes
+                        .requestMatchers(HttpMethod.POST, "/api/reservas").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reservas/**").permitAll()
 
                         // Rotas de configuração para redefinição de senha
                         .requestMatchers(HttpMethod.POST, "/auth/esqueci-senha").permitAll()
