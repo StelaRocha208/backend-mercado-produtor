@@ -42,6 +42,14 @@ public class SecurityConfig {
                         // LIBERAÇÃO TEMPORÁRIA DA PORTARIA
                         .requestMatchers(HttpMethod.POST, "/portaria/entrada").permitAll()
 
+                        // Liberação temporária para testes do mapa
+                        .requestMatchers(HttpMethod.GET, "/api/secoes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/espacos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/espacos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/ocupacao/**").permitAll()
+                        
+
+
                         // Rotas de configuração para redefinição de senha
                         .requestMatchers(HttpMethod.POST, "/auth/esqueci-senha").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/redefinir-senha").permitAll()
