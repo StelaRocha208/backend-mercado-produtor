@@ -42,4 +42,12 @@ public class UsuarioController {
         return ResponseEntity.ok(service.listarUsuarios(busca, pageable));
     }
 
+    @GetMapping("/{id}/detalhes")
+    public ResponseEntity<Object> buscarDetalhes(
+            @PathVariable String id
+    ) {
+        return ResponseEntity.ok(
+                service.buscarDetalhesUsuario(id)
+        );
+    }
 }
