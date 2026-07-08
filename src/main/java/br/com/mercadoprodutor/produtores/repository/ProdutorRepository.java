@@ -9,5 +9,4 @@ public interface ProdutorRepository extends JpaRepository<Produtor, String> {
     boolean existsByCpf(String cpf);
     Optional<Produtor> findByCpf(String cpf);
     Optional<Produtor> findByUsuarioId(String usuarioId);
-
 }

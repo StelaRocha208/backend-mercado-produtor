@@ -51,6 +51,11 @@ public class SecurityConfig {
 
                         .requestMatchers("/error").permitAll()
 
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/usuarios/*/detalhes"
+                        ).permitAll()
+
                         // Qualquer outra rota precisa de token (ex: PUT, DELETE, Dashboard)
                         .anyRequest().authenticated()
                 )
