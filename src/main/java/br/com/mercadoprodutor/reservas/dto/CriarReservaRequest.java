@@ -8,9 +8,6 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 public record CriarReservaRequest(
-        @NotBlank(message = "O produtor é obrigatório.")
-        String produtorId,
-
         @NotBlank(message = "O espaço é obrigatório.")
         String espacoId,
 

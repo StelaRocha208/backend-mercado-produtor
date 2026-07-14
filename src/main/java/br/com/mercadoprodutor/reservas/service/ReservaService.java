@@ -1,16 +1,19 @@
 package br.com.mercadoprodutor.reservas.service;
 
+import br.com.mercadoprodutor.core.exception.RegraNegocioException;
+import br.com.mercadoprodutor.espacos.dto.EspacoResponse;
 import br.com.mercadoprodutor.espacos.model.Espaco;
 import br.com.mercadoprodutor.espacos.model.StatusOcupacao;
 import br.com.mercadoprodutor.espacos.model.TipoSecao;
 import br.com.mercadoprodutor.espacos.repository.EspacoRepository;
+import br.com.mercadoprodutor.espacos.service.EspacoService;
 import br.com.mercadoprodutor.produtores.model.Produtor;
-import br.com.mercadoprodutor.produtores.repository.ProdutorRepository;
 import br.com.mercadoprodutor.reservas.dto.CriarReservaRequest;
 import br.com.mercadoprodutor.reservas.dto.ReservaResponse;
 import br.com.mercadoprodutor.reservas.mapper.ReservaMapper;
 import br.com.mercadoprodutor.reservas.model.Reserva;
 import br.com.mercadoprodutor.reservas.model.StatusReserva;
+import br.com.mercadoprodutor.reservas.repository.ProdutorReservaRepository;
 import br.com.mercadoprodutor.reservas.repository.ReservaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -27,14 +30,15 @@ public class ReservaService {
 
     private final ReservaRepository reservaRepository;
     private final EspacoRepository espacoRepository;
-    private final ProdutorRepository produtorRepository;
+    private final ProdutorReservaRepository produtorReservaRepository;
+    private final EspacoService espacoService;
     private final ReservaMapper reservaMapper;
 
     @Transactional
-    public ReservaResponse criar(CriarReservaRequest request) {
+    public ReservaResponse criar(CriarReservaRequest request, String usuarioId) {
         validarPeriodo(request.dataInicio(), request.dataFim());
 
-        Produtor produtor = buscarProdutor(request.produtorId());
+        Produtor produtor = buscarProdutorPorUsuario(usuarioId);
         Espaco espaco = buscarEspaco(request.espacoId());
 
         validarEspacoReservavel(espaco);
@@ -55,6 +59,24 @@ public class ReservaService {
     }
 
     @Transactional(readOnly = true)
+    public List<ReservaResponse> listarMinhas(String usuarioId) {
+        Produtor produtor = buscarProdutorPorUsuario(usuarioId);
+
+        return listarPorProdutor(produtor.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public List<EspacoResponse> listarDisponibilidade(
+            TipoSecao tipoSecao,
+            LocalDate dataInicio,
+            LocalDate dataFim
+    ) {
+        validarPeriodo(dataInicio, dataFim);
+
+        return espacoService.obterMapaOcupacao(tipoSecao, dataInicio, dataFim);
+    }
+
+    @Transactional(readOnly = true)
     public List<ReservaResponse> listarPorProdutor(String produtorId) {
         if (produtorId == null || produtorId.isBlank()) {
             throw new ResponseStatusException(
@@ -69,11 +91,10 @@ public class ReservaService {
                 .toList();
     }
 
-    private Produtor buscarProdutor(String produtorId) {
-        return produtorRepository.findById(produtorId)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Produtor não encontrado."
+    private Produtor buscarProdutorPorUsuario(String usuarioId) {
+        return produtorReservaRepository.findByUsuarioId(usuarioId)
+                .orElseThrow(() -> new RegraNegocioException(
+                        "Produtor não encontrado para o usuário autenticado."
                 ));
     }
 
@@ -97,6 +118,13 @@ public class ReservaService {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "A data final não pode ser anterior à data inicial."
+            );
+        }
+
+        if (dataInicio.isBefore(LocalDate.now()) || dataFim.isBefore(LocalDate.now())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "As datas da reserva não podem estar no passado."
             );
         }
     }
