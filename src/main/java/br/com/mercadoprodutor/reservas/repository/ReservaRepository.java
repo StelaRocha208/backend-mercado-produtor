@@ -47,6 +47,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, String> {
         join fetch r.espaco e
         join fetch e.secao s
         join fetch r.produtor p
+        join fetch p.usuario
         where p.id = :produtorId
         order by r.dataInicio desc
     """)

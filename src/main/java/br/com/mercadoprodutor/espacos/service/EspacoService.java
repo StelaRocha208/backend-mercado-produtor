@@ -63,10 +63,7 @@ public class EspacoService {
         return reservaRepository.findEspacosReservadosNoPeriodo(
                 dataInicio,
                 dataFim,
-                List.of(
-                        StatusReserva.AGUARDANDO_CONFIRMACAO,
-                        StatusReserva.CONFIRMADA
-                )
+                StatusReserva.bloqueantes()
         );
     }
 

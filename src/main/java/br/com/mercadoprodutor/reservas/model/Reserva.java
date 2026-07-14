@@ -44,8 +44,25 @@ public class Reserva extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status_reserva", nullable = false, length = 40)
+    @Builder.Default
     private StatusReserva statusReserva = StatusReserva.AGUARDANDO_CONFIRMACAO;
 
     @Column(length = 500)
     private String observacao;
+
+    public static Reserva criar(
+            Produtor produtor,
+            Espaco espaco,
+            LocalDate dataInicio,
+            LocalDate dataFim,
+            String observacao
+    ) {
+        return Reserva.builder()
+                .produtor(produtor)
+                .espaco(espaco)
+                .dataInicio(dataInicio)
+                .dataFim(dataFim)
+                .observacao(observacao)
+                .build();
+    }
 }

@@ -12,7 +12,7 @@ public class ReservaMapper {
                 reserva.getId(),
 
                 reserva.getProdutor().getId(),
-                obterNomeProdutor(reserva),
+                reserva.getProdutor().getUsuario().getNome(),
 
                 reserva.getEspaco().getId(),
                 reserva.getEspaco().getNumero(),
@@ -28,13 +28,5 @@ public class ReservaMapper {
 
                 reserva.getDataCriacao()
         );
-    }
-
-    private String obterNomeProdutor(Reserva reserva) {
-        try {
-            return reserva.getProdutor().getUsuario().getNome();
-        } catch (Exception exception) {
-            return null;
-        }
     }
 }

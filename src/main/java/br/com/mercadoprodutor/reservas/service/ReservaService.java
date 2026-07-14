@@ -34,30 +34,20 @@ public class ReservaService {
     public ReservaResponse criar(CriarReservaRequest request) {
         validarPeriodo(request.dataInicio(), request.dataFim());
 
-        Produtor produtor = produtorRepository.findById(request.produtorId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Produtor não encontrado."
-                ));
-
-        Espaco espaco = espacoRepository.findById(request.espacoId())
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Espaço não encontrado."
-                ));
+        Produtor produtor = buscarProdutor(request.produtorId());
+        Espaco espaco = buscarEspaco(request.espacoId());
 
         validarEspacoReservavel(espaco);
         validarSecaoReservavel(espaco);
         validarConflitoDeReserva(espaco, request.dataInicio(), request.dataFim());
 
-        Reserva reserva = Reserva.builder()
-                .produtor(produtor)
-                .espaco(espaco)
-                .dataInicio(request.dataInicio())
-                .dataFim(request.dataFim())
-                .statusReserva(StatusReserva.AGUARDANDO_CONFIRMACAO)
-                .observacao(request.observacao())
-                .build();
+        Reserva reserva = Reserva.criar(
+                produtor,
+                espaco,
+                request.dataInicio(),
+                request.dataFim(),
+                request.observacao()
+        );
 
         Reserva reservaSalva = reservaRepository.save(reserva);
 
@@ -77,6 +67,22 @@ public class ReservaService {
                 .stream()
                 .map(reservaMapper::toResponse)
                 .toList();
+    }
+
+    private Produtor buscarProdutor(String produtorId) {
+        return produtorRepository.findById(produtorId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Produtor não encontrado."
+                ));
+    }
+
+    private Espaco buscarEspaco(String espacoId) {
+        return espacoRepository.findById(espacoId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Espaço não encontrado."
+                ));
     }
 
     private void validarPeriodo(LocalDate dataInicio, LocalDate dataFim) {
@@ -103,8 +109,7 @@ public class ReservaService {
             );
         }
 
-        if (espaco.getStatusOcupacao() == StatusOcupacao.OCUPADO ||
-                espaco.getStatusOcupacao() == StatusOcupacao.INDISPONIVEL) {
+        if (espaco.getStatusOcupacao() != StatusOcupacao.LIVRE) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "O espaço não está disponível para reserva."
@@ -132,10 +137,7 @@ public class ReservaService {
                 espaco.getId(),
                 dataInicio,
                 dataFim,
-                List.of(
-                        StatusReserva.AGUARDANDO_CONFIRMACAO,
-                        StatusReserva.CONFIRMADA
-                )
+                StatusReserva.bloqueantes()
         );
 
         if (existeConflito) {
