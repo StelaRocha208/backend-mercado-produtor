@@ -13,6 +13,8 @@ import br.com.mercadoprodutor.usuarios.model.Usuario;
 import br.com.mercadoprodutor.usuarios.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class CompradorService implements ICompradorService {
@@ -39,7 +41,7 @@ public class CompradorService implements ICompradorService {
                 dto.nome(),
                 dto.email(),
                 senhaCriptografada,
-                PerfilUsuario.COMPRADOR
+                Set.of(PerfilUsuario.COMPRADOR)
         );
 
         usuarioRepository.save(novoUsuario);

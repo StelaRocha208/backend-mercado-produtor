@@ -2,6 +2,8 @@ package br.com.mercadoprodutor.compradores.dto;
 
 import br.com.mercadoprodutor.usuarios.model.PerfilUsuario;
 
+import java.util.Set;
+
 public record CompradorDetalhesDTO(
         String tipo,
         String id,
@@ -10,6 +12,6 @@ public record CompradorDetalhesDTO(
         String cpf,
         String telefone,
         String statusAcesso,
-        PerfilUsuario perfil,
+        Set<PerfilUsuario> perfis,
         String dataCriacao
 ) {}

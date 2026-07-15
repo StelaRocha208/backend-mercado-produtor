@@ -43,7 +43,7 @@ public class UsuarioService implements IUsuarioService {
 
         Usuario usuarioLogado = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        if (usuarioLogado.getPerfis() == PerfilUsuario.OPERADOR && dto.perfil() == PerfilUsuario.ADMINISTRADOR) {
+        if (usuarioLogado.getPerfis().contains(PerfilUsuario.OPERADOR) && dto.perfis().contains(PerfilUsuario.ADMINISTRADOR)) {
             throw new RegraNegocioException("Operadores não têm permissão para cadastrar novos Administradores.");
         }
 
@@ -52,7 +52,7 @@ public class UsuarioService implements IUsuarioService {
         }
 
         String senhaCriptografada = passwordEncoder.encode(dto.senha());
-        Usuario novoUsuario = new Usuario(dto.nome(), dto.email(), senhaCriptografada, dto.perfil());
+        Usuario novoUsuario = new Usuario(dto.nome(), dto.email(), senhaCriptografada, dto.perfis());
 
         repository.save(novoUsuario);
         return new UsuarioResponseDTO(novoUsuario);
@@ -90,8 +90,8 @@ public class UsuarioService implements IUsuarioService {
                 .orElseThrow(() -> new RegraNegocioException("Usuário não encontrado."));
 
         // 1. Caso seja Administrador ou Operador
-        if (usuario.getPerfis() == PerfilUsuario.ADMINISTRADOR ||
-                usuario.getPerfis() == PerfilUsuario.OPERADOR) {
+        if (usuario.getPerfis().contains(PerfilUsuario.ADMINISTRADOR) ||
+                usuario.getPerfis().contains(PerfilUsuario.OPERADOR)) {
             return new UsuarioDetalhesDTO(
                     "USUARIO",
                     usuario.getId(),
@@ -104,7 +104,7 @@ public class UsuarioService implements IUsuarioService {
         }
 
         // 2. Tenta buscar como Comprador
-        if (usuario.getPerfis() == PerfilUsuario.COMPRADOR) {
+        if (usuario.getPerfis().contains(PerfilUsuario.COMPRADOR)) {
             return compradorRepository.findByUsuarioId(id)
                     .map(c -> new CompradorDetalhesDTO(
                             "COMPRADOR",
