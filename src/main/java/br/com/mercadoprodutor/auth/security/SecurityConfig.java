@@ -78,6 +78,16 @@ public class SecurityConfig {
                         
 
 
+                        // Liberação temporária para testes do mapa
+                        .requestMatchers(HttpMethod.GET, "/api/secoes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/espacos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/espacos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/ocupacao/**").permitAll()
+                        
+                        //Lineracao de reservas para testes
+                        .requestMatchers(HttpMethod.POST, "/api/reservas").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/reservas/**").permitAll()
+
                         // Rotas de configuração para redefinição de senha
                         .requestMatchers(HttpMethod.POST, "/auth/esqueci-senha").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/redefinir-senha").permitAll()
