@@ -3,6 +3,7 @@ package br.com.mercadoprodutor.produtores.dto;
 import br.com.mercadoprodutor.usuarios.model.PerfilUsuario;
 
 import java.util.List;
+import java.util.Set;
 
 public record ProdutorDetalhesDTO(
         String tipo,
@@ -12,7 +13,7 @@ public record ProdutorDetalhesDTO(
         String cpf,
         String telefone,
         String statusAcesso,
-        PerfilUsuario perfil,
+        Set<PerfilUsuario> perfis,
         String dataCriacao,
         List<VeiculoResponseDTO> veiculos
 ) {}

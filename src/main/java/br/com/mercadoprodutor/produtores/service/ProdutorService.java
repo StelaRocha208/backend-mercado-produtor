@@ -15,6 +15,8 @@ import br.com.mercadoprodutor.usuarios.model.Usuario;
 import br.com.mercadoprodutor.usuarios.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class ProdutorService implements IProdutorService {
@@ -40,7 +42,7 @@ public class ProdutorService implements IProdutorService {
                 dto.nome(),
                 dto.email(),
                 senhaCriptografada,
-                PerfilUsuario.PRODUTOR
+                Set.of(PerfilUsuario.PRODUTOR)
         );
         usuarioRepository.save(novoUsuario);
 

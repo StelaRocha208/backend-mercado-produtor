@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.Set;
+
 public record UsuarioCreateDTO(
         @NotBlank(message = "O nome é obrigatório")
         String nome,
@@ -17,5 +19,5 @@ public record UsuarioCreateDTO(
         String senha,
 
         @NotNull(message = "O perfil é obrigatório")
-        PerfilUsuario perfil
+        Set<PerfilUsuario> perfis
 ) {}
