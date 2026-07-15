@@ -110,7 +110,7 @@ public class RegistroService implements IRegistroService {
 
         return new RegistroResponseDTO(
                 registro,
-                produtor.getUsuario().getPerfis().name()
+                produtor.getUsuario().getPerfilAtivo()
         );
     }
 
@@ -135,7 +135,7 @@ public class RegistroService implements IRegistroService {
 
         return new RegistroResponseDTO(
                 registro,
-                registro.getProdutor().getUsuario().getPerfis().name()
+                registro.getProdutor().getUsuario().getPerfilAtivo()
         );
     }
 
@@ -150,18 +150,22 @@ public class RegistroService implements IRegistroService {
                 ))
                 .toList();
 
+        List<String> listaPerfis = produtor.getUsuario().getPerfis().stream().map(Enum::name).toList();
+
         return new BuscaPortariaResponseDTO(
                 produtor.getUsuario().getId(),
                 produtor.getUsuario().getNome(),
                 produtor.getCpf(),
                 produtor.getTelefone(),
                 "ATIVO".equalsIgnoreCase(produtor.getUsuario().getStatusAcesso()),
-                List.of(produtor.getUsuario().getPerfis().name()),
+                listaPerfis,
                 veiculos
         );
     }
 
     private BuscaPortariaResponseDTO montarRespostaComprador(Comprador comprador) {
+
+        List<String> listaPerfis = comprador.getUsuario().getPerfis().stream().map(Enum::name).toList();
 
         return new BuscaPortariaResponseDTO(
                 comprador.getUsuario().getId(),
@@ -169,7 +173,7 @@ public class RegistroService implements IRegistroService {
                 comprador.getCpf(),
                 comprador.getTelefone(),
                 "ATIVO".equalsIgnoreCase(comprador.getUsuario().getStatusAcesso()),
-                List.of(comprador.getUsuario().getPerfis().name()),
+                listaPerfis,
                 List.of()
         );
     }
