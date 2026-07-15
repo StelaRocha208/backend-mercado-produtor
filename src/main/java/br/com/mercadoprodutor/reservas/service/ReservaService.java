@@ -148,10 +148,10 @@ public class ReservaService {
     private void validarSecaoReservavel(Espaco espaco) {
         TipoSecao tipoSecao = espaco.getSecao().getTipo();
 
-        if (tipoSecao != TipoSecao.PEDRA && tipoSecao != TipoSecao.VOLANTE) {
+        if (tipoSecao != TipoSecao.VOLANTE) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "A reserva antecipada está disponível apenas para Pedra e Volante."
+                    "A reserva antecipada está disponível apenas para Volante."
             );
         }
     }
