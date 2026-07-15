@@ -8,9 +8,12 @@ public record BuscaPortariaResponseDTO(
         String nome,
         String cpf,
         String telefone,
-        boolean ativo,
+        Boolean ativo,
+
+        Boolean inadimplente,
+        String justificativaInadimplencia,
+
         List<String> perfis,
         List<VeiculoPortariaDTO> veiculos
-
 ) {
 }

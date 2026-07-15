@@ -10,6 +10,7 @@ import br.com.mercadoprodutor.compradores.model.Comprador;
 import br.com.mercadoprodutor.compradores.repository.CompradorRepository;
 import br.com.mercadoprodutor.core.exception.RegraNegocioException;
 import br.com.mercadoprodutor.portaria.dto.BuscaPortariaResponseDTO;
+import br.com.mercadoprodutor.portaria.dto.LiberacaoExcepcionalDTO;
 import br.com.mercadoprodutor.portaria.dto.RegistroEntradaDTO;
 import br.com.mercadoprodutor.portaria.dto.RegistroResponseDTO;
 import br.com.mercadoprodutor.portaria.dto.RegistroSaidaDTO;
@@ -62,6 +63,30 @@ public class RegistroService implements IRegistroService {
 
     @Override
     @Transactional
+    public void liberarAcesso(LiberacaoExcepcionalDTO dto) {
+
+        Produtor produtor = produtorRepository.findByUsuarioId(dto.usuarioId())
+                .orElseThrow(() ->
+                        new RegraNegocioException("Produtor não encontrado."));
+
+        if (!produtor.getInadimplente()) {
+            throw new RegraNegocioException(
+                    "O produtor não possui pendências.");
+        }
+
+        if (dto.justificativa() == null || dto.justificativa().isBlank()) {
+            throw new RegraNegocioException(
+                    "Informe uma justificativa para liberar o acesso.");
+        }
+
+        produtor.setJustificativaInadimplencia(dto.justificativa());
+        produtor.setLiberacaoExcepcional(true);
+
+        produtorRepository.save(produtor);
+    }
+
+    @Override
+    @Transactional
     public RegistroResponseDTO registrarEntrada(RegistroEntradaDTO dto) {
 
         if (!"PRODUTOR".equalsIgnoreCase(dto.perfil())) {
@@ -82,6 +107,13 @@ public class RegistroService implements IRegistroService {
                     "O veículo informado não pertence ao produtor selecionado.");
         }
 
+        if (produtor.getInadimplente()
+                && !Boolean.TRUE.equals(produtor.getLiberacaoExcepcional())) {
+
+            throw new RegraNegocioException(
+                    "Produtor inadimplente. É necessária autorização excepcional.");
+        }
+
         registroRepository
                 .findByProdutorIdAndStatusRegistro(
                         produtor.getId(),
@@ -99,6 +131,28 @@ public class RegistroService implements IRegistroService {
 
         registro.setDataEntrada(LocalDateTime.now());
         registro.setStatusRegistro(StatusRegistro.EM_ANDAMENTO);
+
+        /*
+         * Salva no histórico do registro
+         */
+
+        if (Boolean.TRUE.equals(produtor.getLiberacaoExcepcional())) {
+
+            registro.setLiberacaoExcepcional(true);
+            registro.setJustificativaLiberacao(
+                    produtor.getJustificativaInadimplencia()
+            );
+            registro.setDataLiberacao(LocalDateTime.now());
+
+            /*
+             * Limpa o produtor para futuras visitas
+             */
+
+            produtor.setLiberacaoExcepcional(false);
+            produtor.setJustificativaInadimplencia(null);
+
+            produtorRepository.save(produtor);
+        }
 
         /*
          * TODO
@@ -127,15 +181,16 @@ public class RegistroService implements IRegistroService {
                     "Este registro já foi encerrado.");
         }
 
-        registro.setDataSaida(LocalDateTime.now());
+        Produtor produtor = registro.getProdutor();
 
+        registro.setDataSaida(LocalDateTime.now());
         registro.setStatusRegistro(StatusRegistro.ENCERRADO);
 
         registro = registroRepository.save(registro);
 
         return new RegistroResponseDTO(
                 registro,
-                registro.getProdutor().getUsuario().getPerfis().name()
+                produtor.getUsuario().getPerfis().name()
         );
     }
 
@@ -156,6 +211,8 @@ public class RegistroService implements IRegistroService {
                 produtor.getCpf(),
                 produtor.getTelefone(),
                 "ATIVO".equalsIgnoreCase(produtor.getUsuario().getStatusAcesso()),
+                produtor.getInadimplente(),
+                produtor.getJustificativaInadimplencia(),
                 List.of(produtor.getUsuario().getPerfis().name()),
                 veiculos
         );
@@ -169,9 +226,10 @@ public class RegistroService implements IRegistroService {
                 comprador.getCpf(),
                 comprador.getTelefone(),
                 "ATIVO".equalsIgnoreCase(comprador.getUsuario().getStatusAcesso()),
+                false,
+                null,
                 List.of(comprador.getUsuario().getPerfis().name()),
                 List.of()
         );
     }
-
 }

@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import br.com.mercadoprodutor.portaria.dto.BuscaPortariaResponseDTO;
+import br.com.mercadoprodutor.portaria.dto.LiberacaoExcepcionalDTO;
 import br.com.mercadoprodutor.portaria.dto.RegistroEntradaDTO;
 import br.com.mercadoprodutor.portaria.dto.RegistroResponseDTO;
 import br.com.mercadoprodutor.portaria.dto.RegistroSaidaDTO;
@@ -49,4 +50,12 @@ public class PortariaController {
         return ResponseEntity.ok(registro);
     }
 
+    @PostMapping("/liberar-acesso")
+    public ResponseEntity<Void> liberarAcesso(
+            @RequestBody LiberacaoExcepcionalDTO dto) {
+
+        registroService.liberarAcesso(dto);
+
+        return ResponseEntity.ok().build();
+   }
 }

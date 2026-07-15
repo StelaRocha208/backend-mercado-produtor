@@ -1,0 +1,2 @@
+ALTER TABLE produtores
+ADD COLUMN IF NOT EXISTS liberacao_excepcional BOOLEAN NOT NULL DEFAULT FALSE;
