@@ -44,6 +44,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/portaria/busca").permitAll()
                         .requestMatchers(HttpMethod.POST, "/portaria/entrada").permitAll()
                         .requestMatchers(HttpMethod.POST, "/portaria/saida").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/portaria/liberar-acesso").permitAll()
 
                         // Liberação temporária para testes do mapa
                         .requestMatchers(HttpMethod.GET, "/api/secoes").permitAll()

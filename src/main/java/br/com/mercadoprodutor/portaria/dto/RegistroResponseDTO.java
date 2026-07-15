@@ -13,9 +13,15 @@ public record RegistroResponseDTO(
         String perfil,
         String veiculoId,
         String placa,
+
         LocalDateTime dataEntrada,
         LocalDateTime dataSaida,
-        StatusRegistro statusRegistro
+
+        StatusRegistro statusRegistro,
+
+        Boolean liberacaoExcepcional,
+        String justificativaLiberacao,
+        LocalDateTime dataLiberacao
 
 ) {
 
@@ -32,9 +38,15 @@ public record RegistroResponseDTO(
                 perfil,
                 registro.getVeiculo().getId(),
                 registro.getVeiculo().getPlaca(),
+
                 registro.getDataEntrada(),
                 registro.getDataSaida(),
-                registro.getStatusRegistro()
+
+                registro.getStatusRegistro(),
+
+                registro.getLiberacaoExcepcional(),
+                registro.getJustificativaLiberacao(),
+                registro.getDataLiberacao()
 
         );
     }
