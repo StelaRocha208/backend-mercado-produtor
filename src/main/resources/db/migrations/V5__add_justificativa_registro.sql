@@ -1,0 +1,5 @@
+ALTER TABLE registros
+ADD COLUMN IF NOT EXISTS justificativa_liberacao VARCHAR(500);
+
+ALTER TABLE registros
+ADD COLUMN IF NOT EXISTS liberacao_excepcional BOOLEAN NOT NULL DEFAULT FALSE;

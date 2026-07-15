@@ -39,8 +39,44 @@ public class SecurityConfig {
                         // Liberação temporária para testes do GET no painel administrativo
                         .requestMatchers(HttpMethod.GET, "/api/usuarios").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/audit").permitAll()
+                        
                         // LIBERAÇÃO TEMPORÁRIA DA PORTARIA
+                        .requestMatchers(HttpMethod.GET, "/portaria/busca").permitAll()
                         .requestMatchers(HttpMethod.POST, "/portaria/entrada").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/portaria/saida").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/portaria/liberar-acesso").permitAll()
+
+                        // Liberação temporária para testes do mapa
+                        .requestMatchers(HttpMethod.GET, "/api/secoes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/espacos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/espacos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/ocupacao/**").permitAll()
+
+
+
+                        // Liberação temporária para testes do mapa
+                        .requestMatchers(HttpMethod.GET, "/api/secoes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/espacos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/espacos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/ocupacao/**").permitAll()
+                        
+
+
+                        // Liberação temporária para testes do mapa
+                        .requestMatchers(HttpMethod.GET, "/api/secoes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/espacos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/espacos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/ocupacao/**").permitAll()
+                        
+
+
+                        // Liberação temporária para testes do mapa
+                        .requestMatchers(HttpMethod.GET, "/api/secoes").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/espacos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/espacos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/ocupacao/**").permitAll()
+                        
+
 
                         // Liberação temporária para testes do mapa
                         .requestMatchers(HttpMethod.GET, "/api/secoes").permitAll()
@@ -57,6 +93,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/auth/redefinir-senha").permitAll()
 
                         .requestMatchers("/error").permitAll()
+
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/api/usuarios/*/detalhes"
+                        ).permitAll()
 
                         // Qualquer outra rota precisa de token (ex: PUT, DELETE, Dashboard)
                         .anyRequest().authenticated()

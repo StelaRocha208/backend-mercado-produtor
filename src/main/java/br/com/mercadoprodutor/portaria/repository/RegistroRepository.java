@@ -13,4 +13,5 @@ public interface RegistroRepository extends JpaRepository<Registro, String> {
             String produtorId,
             StatusRegistro statusRegistro
     );
+
 }

@@ -23,6 +23,30 @@ public class Produtor extends BaseEntity {
     @Column(length = 20)
     private String telefone;
 
+    /**
+     * Controle temporário de inadimplência.
+     * Futuramente será calculado automaticamente
+     * pelo módulo financeiro.
+     */
+    @Column(nullable = false)
+    private Boolean inadimplente = false;
+
+    /**
+     * Justificativa informada pelo operador
+     * quando a saída é permitida mesmo havendo pendência.
+     */
+    @Column(name = "justificativa_inadimplencia", length = 500)
+    private String justificativaInadimplencia;
+
+    /**
+     * Indica que o operador autorizou
+     * uma entrada excepcional para este produtor.
+     * Após o registro da entrada, este campo
+     * deve voltar para false.
+     */
+    @Column(name = "liberacao_excepcional", nullable = false)
+    private Boolean liberacaoExcepcional = false;
+
     // Buscar um produtor não traz o Usuario inteiro na query a menos que você chame produtor.getUsuario().getNome()
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "usuario_id", nullable = false)

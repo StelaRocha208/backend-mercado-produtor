@@ -4,8 +4,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import br.com.mercadoprodutor.portaria.dto.BuscaPortariaResponseDTO;
+import br.com.mercadoprodutor.portaria.dto.LiberacaoExcepcionalDTO;
 import br.com.mercadoprodutor.portaria.dto.RegistroEntradaDTO;
 import br.com.mercadoprodutor.portaria.dto.RegistroResponseDTO;
+import br.com.mercadoprodutor.portaria.dto.RegistroSaidaDTO;
 import br.com.mercadoprodutor.portaria.service.IRegistroService;
 import lombok.RequiredArgsConstructor;
 
@@ -15,6 +18,15 @@ import lombok.RequiredArgsConstructor;
 public class PortariaController {
 
     private final IRegistroService registroService;
+
+    @GetMapping("/busca")
+    public ResponseEntity<BuscaPortariaResponseDTO> buscarUsuario(
+            @RequestParam String valor) {
+
+        return ResponseEntity.ok(
+                registroService.buscarUsuario(valor)
+        );
+    }
 
     @PostMapping("/entrada")
     public ResponseEntity<RegistroResponseDTO> registrarEntrada(
@@ -27,4 +39,23 @@ public class PortariaController {
                 .status(HttpStatus.CREATED)
                 .body(registro);
     }
+
+    @PostMapping("/saida")
+    public ResponseEntity<RegistroResponseDTO> registrarSaida(
+            @RequestBody RegistroSaidaDTO dto) {
+
+        RegistroResponseDTO registro =
+                registroService.registrarSaida(dto);
+
+        return ResponseEntity.ok(registro);
+    }
+
+    @PostMapping("/liberar-acesso")
+    public ResponseEntity<Void> liberarAcesso(
+            @RequestBody LiberacaoExcepcionalDTO dto) {
+
+        registroService.liberarAcesso(dto);
+
+        return ResponseEntity.ok().build();
+   }
 }
