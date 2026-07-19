@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import br.com.mercadoprodutor.core.model.BaseEntity;
 import br.com.mercadoprodutor.produtores.model.Produtor;
 import br.com.mercadoprodutor.produtores.model.Veiculo;
+import br.com.mercadoprodutor.reservas.model.Reserva;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -71,4 +72,8 @@ public class Registro extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "veiculo_id", nullable = false)
     private Veiculo veiculo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reserva_id")
+    private Reserva reserva;
 }

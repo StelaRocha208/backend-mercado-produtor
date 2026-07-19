@@ -13,6 +13,9 @@ public record RegistroResponseDTO(
         String perfil,
         String veiculoId,
         String placa,
+        String reservaId,
+        String secao,
+        String espaco,
 
         LocalDateTime dataEntrada,
         LocalDateTime dataSaida,
@@ -38,6 +41,10 @@ public record RegistroResponseDTO(
                 perfil,
                 registro.getVeiculo().getId(),
                 registro.getVeiculo().getPlaca(),
+
+                registro.getReserva() != null ? registro.getReserva().getId() : null,
+                registro.getSecao(),
+                registro.getEspaco(),
 
                 registro.getDataEntrada(),
                 registro.getDataSaida(),
