@@ -12,6 +12,7 @@ public class ReservaMapper {
                 reserva.getId(),
 
                 reserva.getProdutor().getId(),
+                reserva.getProdutor().getUsuario().getId(),
                 reserva.getProdutor().getUsuario().getNome(),
 
                 reserva.getEspaco().getId(),
@@ -21,10 +22,16 @@ public class ReservaMapper {
 
                 reserva.getDataInicio(),
                 reserva.getDataFim(),
+                reserva.getDataEncerramento(),
 
+                reserva.getTipoReserva(),
                 reserva.getStatusReserva(),
+                reserva.getReservaOrigem() == null
+                        ? null
+                        : reserva.getReservaOrigem().getId(),
 
                 reserva.getObservacao(),
+                reserva.getMotivoEncerramento(),
 
                 reserva.getDataCriacao()
         );

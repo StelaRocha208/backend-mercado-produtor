@@ -1,7 +1,6 @@
 package br.com.mercadoprodutor.espacos.controller;
 
 import br.com.mercadoprodutor.espacos.dto.EspacoResponse;
-import br.com.mercadoprodutor.espacos.dto.OcupacaoResumoResponse;
 import br.com.mercadoprodutor.espacos.dto.SecaoResponse;
 import br.com.mercadoprodutor.espacos.model.TipoSecao;
 import br.com.mercadoprodutor.espacos.service.EspacoService;
@@ -28,17 +27,15 @@ public class EspacoController {
 
     @GetMapping("/espacos")
     public ResponseEntity<List<EspacoResponse>> listarEspacos(
-        @RequestParam(required = false) TipoSecao secao
+            @RequestParam(required = false) TipoSecao secao
     ) {
         return ResponseEntity.ok(espacoService.listarEspacos(secao, null, null));
     }
 
     @GetMapping("/ocupacao/mapa")
     public ResponseEntity<List<EspacoResponse>> obterMapaOcupacao(
-        @RequestParam(required = false) TipoSecao secao
+            @RequestParam(required = false) TipoSecao secao
     ) {
         return ResponseEntity.ok(espacoService.listarEspacos(secao, null, null));
     }
-
-
 }
