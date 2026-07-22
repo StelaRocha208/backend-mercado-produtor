@@ -123,6 +123,7 @@ public class EspacoService {
                 espaco.getSecao().getNome(),
                 espaco.getSecao().getTipo(),
                 espaco.getAreaM2(),
+                espaco.getSecao().getTaxaPorM2(),
                 statusCalculado,
                 espaco.getAtivo(),
                 espaco.getPavilhao(),
