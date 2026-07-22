@@ -14,6 +14,8 @@ public record BuscaPortariaResponseDTO(
         String justificativaInadimplencia,
 
         List<String> perfis,
-        List<VeiculoPortariaDTO> veiculos
+        List<VeiculoPortariaDTO> veiculos,
+        List<ReservaPortariaDTO> reservas
+
 ) {
 }

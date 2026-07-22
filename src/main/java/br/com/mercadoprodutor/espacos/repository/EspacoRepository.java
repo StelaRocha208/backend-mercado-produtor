@@ -4,14 +4,26 @@ import br.com.mercadoprodutor.espacos.model.Espaco;
 import br.com.mercadoprodutor.espacos.model.Secao;
 import br.com.mercadoprodutor.espacos.model.TipoSecao;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import jakarta.persistence.LockModeType;
 import java.util.List;
+import java.util.Optional;
 
 public interface EspacoRepository extends JpaRepository<Espaco, String> {
 
     boolean existsBySecaoAndNumero(Secao secao, String numero);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+        select e
+        from Espaco e
+        join fetch e.secao
+        where e.id = :id
+    """)
+    Optional<Espaco> findByIdParaAtualizacao(@Param("id") String id);
 
     @Query("""
         select e

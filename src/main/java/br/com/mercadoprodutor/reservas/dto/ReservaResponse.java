@@ -2,14 +2,19 @@ package br.com.mercadoprodutor.reservas.dto;
 
 import br.com.mercadoprodutor.espacos.model.TipoSecao;
 import br.com.mercadoprodutor.reservas.model.StatusReserva;
+import br.com.mercadoprodutor.reservas.model.TipoReserva;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+/**
+ * Apresenta os dados comuns a todos os tipos de reserva.
+ */
 public record ReservaResponse(
         String id,
 
         String produtorId,
+        String usuarioId,
         String produtorNome,
 
         String espacoId,
@@ -19,10 +24,14 @@ public record ReservaResponse(
 
         LocalDate dataInicio,
         LocalDate dataFim,
+        LocalDate dataEncerramento,
 
+        TipoReserva tipoReserva,
         StatusReserva statusReserva,
+        String reservaOrigemId,
 
         String observacao,
+        String motivoEncerramento,
 
         LocalDateTime dataCriacao
 ) {
