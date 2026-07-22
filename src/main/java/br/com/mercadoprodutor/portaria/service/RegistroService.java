@@ -22,6 +22,10 @@ import br.com.mercadoprodutor.produtores.model.Produtor;
 import br.com.mercadoprodutor.produtores.model.Veiculo;
 import br.com.mercadoprodutor.produtores.repository.ProdutorRepository;
 import br.com.mercadoprodutor.produtores.repository.VeiculoRepository;
+import br.com.mercadoprodutor.reservas.model.Reserva;
+import br.com.mercadoprodutor.reservas.repository.ReservaRepository;
+import br.com.mercadoprodutor.portaria.dto.ReservaPortariaDTO;
+import br.com.mercadoprodutor.reservas.model.StatusReserva;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -32,6 +36,7 @@ public class RegistroService implements IRegistroService {
     private final ProdutorRepository produtorRepository;
     private final CompradorRepository compradorRepository;
     private final VeiculoRepository veiculoRepository;
+    private final ReservaRepository reservaRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -132,6 +137,35 @@ public class RegistroService implements IRegistroService {
         registro.setDataEntrada(LocalDateTime.now());
         registro.setStatusRegistro(StatusRegistro.EM_ANDAMENTO);
 
+       if (dto.reservaId() != null && !dto.reservaId().isBlank()) {
+
+    Reserva reserva = reservaRepository.findById(dto.reservaId())
+            .orElseThrow(() ->
+                    new RegraNegocioException("Reserva não encontrada."));
+
+    if (!reserva.getProdutor().getId().equals(produtor.getId())) {
+        throw new RegraNegocioException(
+                "A reserva não pertence ao produtor informado."
+        );
+    }
+
+    if (reserva.getStatusReserva() != StatusReserva.CONFIRMADA) {
+        throw new RegraNegocioException(
+                "A reserva selecionada não está confirmada."
+        );
+    }
+
+    registro.setReserva(reserva);
+
+    registro.setSecao(
+            reserva.getEspaco().getSecao().getNome()
+    );
+
+    registro.setEspaco(
+            reserva.getEspaco().getNumero()
+    );
+}
+
         /*
          * Salva no histórico do registro
          */
@@ -154,12 +188,7 @@ public class RegistroService implements IRegistroService {
             produtorRepository.save(produtor);
         }
 
-        /*
-         * TODO
-         * Quando o módulo Reserva estiver implementado,
-         * o Registro será vinculado à Reserva.
-         */
-
+        
         registro = registroRepository.save(registro);
 
         return new RegistroResponseDTO(
@@ -196,40 +225,53 @@ public class RegistroService implements IRegistroService {
 
     private BuscaPortariaResponseDTO montarRespostaProdutor(Produtor produtor) {
 
-        List<VeiculoPortariaDTO> veiculos = produtor.getVeiculos()
-                .stream()
-                .map(v -> new VeiculoPortariaDTO(
-                        v.getId(),
-                        v.getPlaca(),
-                        v.getTipo()
-                ))
-                .toList();
+    List<VeiculoPortariaDTO> veiculos = produtor.getVeiculos()
+            .stream()
+            .map(v -> new VeiculoPortariaDTO(
+                    v.getId(),
+                    v.getPlaca(),
+                    v.getTipo()
+            ))
+            .toList();
 
-        return new BuscaPortariaResponseDTO(
-                produtor.getUsuario().getId(),
-                produtor.getUsuario().getNome(),
-                produtor.getCpf(),
-                produtor.getTelefone(),
-                "ATIVO".equalsIgnoreCase(produtor.getUsuario().getStatusAcesso()),
-                produtor.getInadimplente(),
-                produtor.getJustificativaInadimplencia(),
-                List.of(produtor.getUsuario().getPerfis().name()),
-                veiculos
-        );
-    }
+    List<ReservaPortariaDTO> reservas = reservaRepository
+        .findByProdutorIdComDetalhes(produtor.getId())
+        .stream()
+        .filter(r -> r.getStatusReserva() == StatusReserva.CONFIRMADA)
+        .map(r -> new ReservaPortariaDTO(
+                r.getId(),
+                r.getEspaco().getSecao().getNome(),
+                r.getEspaco().getNumero()
+        ))
+        .toList();
+
+    return new BuscaPortariaResponseDTO(
+            produtor.getUsuario().getId(),
+            produtor.getUsuario().getNome(),
+            produtor.getCpf(),
+            produtor.getTelefone(),
+            "ATIVO".equalsIgnoreCase(produtor.getUsuario().getStatusAcesso()),
+            produtor.getInadimplente(),
+            produtor.getJustificativaInadimplencia(),
+            List.of(produtor.getUsuario().getPerfis().name()),
+            veiculos,
+            reservas
+    );
+}
 
     private BuscaPortariaResponseDTO montarRespostaComprador(Comprador comprador) {
 
         return new BuscaPortariaResponseDTO(
-                comprador.getUsuario().getId(),
-                comprador.getUsuario().getNome(),
-                comprador.getCpf(),
-                comprador.getTelefone(),
-                "ATIVO".equalsIgnoreCase(comprador.getUsuario().getStatusAcesso()),
-                false,
-                null,
-                List.of(comprador.getUsuario().getPerfis().name()),
-                List.of()
-        );
+        comprador.getUsuario().getId(),
+        comprador.getUsuario().getNome(),
+        comprador.getCpf(),
+        comprador.getTelefone(),
+        "ATIVO".equalsIgnoreCase(comprador.getUsuario().getStatusAcesso()),
+        false,
+        null,
+        List.of(comprador.getUsuario().getPerfis().name()),
+        List.of(),
+        List.of()
+);
     }
 }

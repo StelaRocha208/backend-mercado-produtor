@@ -4,7 +4,8 @@ public record RegistroEntradaDTO(
 
         String usuarioId,
         String perfil,
-        String veiculoId
+        String veiculoId,
+        String reservaId
 
 ) {
 }
