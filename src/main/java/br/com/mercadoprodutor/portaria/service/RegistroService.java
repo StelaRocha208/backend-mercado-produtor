@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import br.com.mercadoprodutor.compradores.model.Comprador;
 import br.com.mercadoprodutor.compradores.repository.CompradorRepository;
 import br.com.mercadoprodutor.core.exception.RegraNegocioException;
@@ -137,34 +138,9 @@ public class RegistroService implements IRegistroService {
         registro.setDataEntrada(LocalDateTime.now());
         registro.setStatusRegistro(StatusRegistro.EM_ANDAMENTO);
 
-       if (dto.reservaId() != null && !dto.reservaId().isBlank()) {
-
-    Reserva reserva = reservaRepository.findById(dto.reservaId())
-            .orElseThrow(() ->
-                    new RegraNegocioException("Reserva não encontrada."));
-
-    if (!reserva.getProdutor().getId().equals(produtor.getId())) {
-        throw new RegraNegocioException(
-                "A reserva não pertence ao produtor informado."
-        );
-    }
-
-    if (reserva.getStatusReserva() != StatusReserva.CONFIRMADA) {
-        throw new RegraNegocioException(
-                "A reserva selecionada não está confirmada."
-        );
-    }
-
-    registro.setReserva(reserva);
-
-    registro.setSecao(
-            reserva.getEspaco().getSecao().getNome()
-    );
-
-    registro.setEspaco(
-            reserva.getEspaco().getNumero()
-    );
-}
+        registro.setTaxaVeiculo(
+        calcularTaxaVeiculo(veiculo.getTipo())
+);
 
         /*
          * Salva no histórico do registro
@@ -274,4 +250,24 @@ public class RegistroService implements IRegistroService {
         List.of()
 );
     }
+
+    private BigDecimal calcularTaxaVeiculo(String tipo) {
+
+    if (tipo == null) {
+        return BigDecimal.ZERO;
+    }
+
+    return switch (tipo.toUpperCase()) {
+
+        case "CARRETA" -> BigDecimal.valueOf(30);
+
+        case "CAMINHÃO", "CAMINHAO" -> BigDecimal.valueOf(20);
+
+        case "UTILITÁRIO", "UTILITARIO" -> BigDecimal.valueOf(15);
+
+        case "MOTO" -> BigDecimal.valueOf(3);
+
+        default -> BigDecimal.ZERO;
+    };
+}
 }

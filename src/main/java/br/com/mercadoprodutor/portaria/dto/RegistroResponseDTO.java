@@ -1,6 +1,7 @@
 package br.com.mercadoprodutor.portaria.dto;
 
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 import br.com.mercadoprodutor.portaria.model.Registro;
 import br.com.mercadoprodutor.portaria.model.StatusRegistro;
@@ -13,9 +14,7 @@ public record RegistroResponseDTO(
         String perfil,
         String veiculoId,
         String placa,
-        String reservaId,
-        String secao,
-        String espaco,
+        BigDecimal taxaVeiculo,
 
         LocalDateTime dataEntrada,
         LocalDateTime dataSaida,
@@ -41,6 +40,7 @@ public record RegistroResponseDTO(
                 perfil,
                 registro.getVeiculo().getId(),
                 registro.getVeiculo().getPlaca(),
+                registro.getTaxaVeiculo(),
 
                 registro.getReserva() != null ? registro.getReserva().getId() : null,
                 registro.getSecao(),
