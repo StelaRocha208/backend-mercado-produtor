@@ -33,6 +33,15 @@ public class ReservaMapper {
                 reserva.getObservacao(),
                 reserva.getMotivoEncerramento(),
 
+                reserva.getAreaM2Cobrada() == null
+                        ? reserva.getEspaco().getAreaM2()
+                        : reserva.getAreaM2Cobrada(),
+                reserva.getTarifaPorM2Aplicada() == null
+                        ? reserva.getEspaco().getSecao().getTaxaPorM2()
+                        : reserva.getTarifaPorM2Aplicada(),
+                reserva.getDiasUso(),
+                reserva.getValorTaxaSolo(),
+
                 reserva.getDataCriacao()
         );
     }

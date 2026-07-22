@@ -4,6 +4,7 @@ import br.com.mercadoprodutor.espacos.model.TipoSecao;
 import br.com.mercadoprodutor.reservas.model.StatusReserva;
 import br.com.mercadoprodutor.reservas.model.TipoReserva;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -32,6 +33,11 @@ public record ReservaResponse(
 
         String observacao,
         String motivoEncerramento,
+
+        BigDecimal areaM2,
+        BigDecimal tarifaPorM2,
+        Integer diasUso,
+        BigDecimal valorTaxaSolo,
 
         LocalDateTime dataCriacao
 ) {
