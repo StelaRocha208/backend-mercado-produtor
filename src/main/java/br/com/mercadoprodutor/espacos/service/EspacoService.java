@@ -1,10 +1,16 @@
 package br.com.mercadoprodutor.espacos.service;
 
+import br.com.mercadoprodutor.audit.aspect.AuditarAcao;
+import br.com.mercadoprodutor.core.exception.RegraNegocioException;
+import br.com.mercadoprodutor.espacos.dto.AtualizarAreaSecaoRequest;
+import br.com.mercadoprodutor.espacos.dto.AtualizarTarifaSecaoRequest;
 import br.com.mercadoprodutor.espacos.dto.EspacoResponse;
+import br.com.mercadoprodutor.espacos.dto.SecaoResponse;
 import br.com.mercadoprodutor.espacos.model.Espaco;
 import br.com.mercadoprodutor.espacos.model.StatusOcupacao;
 import br.com.mercadoprodutor.espacos.model.TipoSecao;
 import br.com.mercadoprodutor.espacos.repository.EspacoRepository;
+import br.com.mercadoprodutor.espacos.repository.SecaoRepository;
 import br.com.mercadoprodutor.reservas.model.StatusReserva;
 import br.com.mercadoprodutor.reservas.model.TipoReserva;
 import br.com.mercadoprodutor.reservas.repository.ReservaRepository;
@@ -13,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Set;
 
@@ -24,7 +32,47 @@ import java.util.Set;
 public class EspacoService {
 
     private final EspacoRepository espacoRepository;
+    private final SecaoRepository secaoRepository;
     private final ReservaRepository reservaRepository;
+
+    @Transactional(readOnly = true)
+    public List<SecaoResponse> listarSecoes() {
+        return secaoRepository.findByAtivaTrueOrderByOrdemVisualAsc()
+                .stream()
+                .map(SecaoResponse::fromEntity)
+                .toList();
+    }
+
+    @AuditarAcao(valor = "Tarifa por metro quadrado atualizada")
+    @Transactional
+    public SecaoResponse atualizarTarifa(
+            String secaoId,
+            AtualizarTarifaSecaoRequest request
+    ) {
+        var secao = secaoRepository.findById(secaoId)
+                .orElseThrow(() -> new RegraNegocioException(
+                        "Seção não encontrada."
+                ));
+
+        secao.setTaxaPorM2(request.taxaPorM2());
+        return SecaoResponse.fromEntity(secao);
+    }
+
+    @AuditarAcao(valor = "Área das vagas da seção atualizada")
+    @Transactional
+    public void atualizarArea(
+            String secaoId,
+            AtualizarAreaSecaoRequest request
+    ) {
+        if (!secaoRepository.existsById(secaoId)) {
+            throw new RegraNegocioException("Seção não encontrada.");
+        }
+
+        espacoRepository.atualizarAreaM2PorSecao(
+                secaoId,
+                request.areaM2()
+        );
+    }
 
     @Transactional(readOnly = true)
     public List<EspacoResponse> listarEspacos(
@@ -123,6 +171,8 @@ public class EspacoService {
                 espaco.getSecao().getNome(),
                 espaco.getSecao().getTipo(),
                 espaco.getAreaM2(),
+                espaco.getSecao().getTaxaPorM2(),
+                calcularValorDiaria(espaco),
                 statusCalculado,
                 espaco.getAtivo(),
                 espaco.getPavilhao(),
@@ -135,6 +185,18 @@ public class EspacoService {
                 selecionavelAdministracao,
                 motivoBloqueioAdministracao
         );
+    }
+
+    private BigDecimal calcularValorDiaria(Espaco espaco) {
+        BigDecimal areaM2 = espaco.getAreaM2();
+        BigDecimal tarifaPorM2 = espaco.getSecao().getTaxaPorM2();
+
+        if (areaM2 == null || tarifaPorM2 == null) {
+            return null;
+        }
+
+        return areaM2.multiply(tarifaPorM2)
+                .setScale(2, RoundingMode.HALF_UP);
     }
 
     private StatusOcupacao calcularStatusOcupacao(

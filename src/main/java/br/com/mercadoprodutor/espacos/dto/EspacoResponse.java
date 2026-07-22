@@ -12,6 +12,8 @@ public record EspacoResponse(
         String secaoNome,
         TipoSecao secaoTipo,
         BigDecimal areaM2,
+        BigDecimal tarifaPorM2,
+        BigDecimal valorDiaria,
         StatusOcupacao statusOcupacao,
         Boolean ativo,
         String pavilhao,
