@@ -52,6 +52,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/espacos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/ocupacao/**").permitAll()
 
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/secoes/*/tarifa",
+                                "/api/secoes/*/area"
+                        ).hasRole("ADMIN")
+
                         // Reservas administrativas são exclusivas do administrador
                         .requestMatchers(
                                 "/api/reservas/administrativas",
