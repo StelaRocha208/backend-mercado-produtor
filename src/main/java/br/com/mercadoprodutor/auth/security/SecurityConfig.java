@@ -52,39 +52,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/espacos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/ocupacao/**").permitAll()
 
+                        // Reservas administrativas são exclusivas do administrador
+                        .requestMatchers(
+                                "/api/reservas/administrativas",
+                                "/api/reservas/administrativas/**"
+                        ).hasRole("ADMIN")
 
-
-                        // Liberação temporária para testes do mapa
-                        .requestMatchers(HttpMethod.GET, "/api/secoes").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/espacos").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/espacos/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/ocupacao/**").permitAll()
-                        
-
-
-                        // Liberação temporária para testes do mapa
-                        .requestMatchers(HttpMethod.GET, "/api/secoes").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/espacos").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/espacos/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/ocupacao/**").permitAll()
-                        
-
-
-                        // Liberação temporária para testes do mapa
-                        .requestMatchers(HttpMethod.GET, "/api/secoes").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/espacos").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/espacos/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/ocupacao/**").permitAll()
-                        
-
-
-                        // Liberação temporária para testes do mapa
-                        .requestMatchers(HttpMethod.GET, "/api/secoes").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/espacos").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/espacos/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/ocupacao/**").permitAll()
-                        
-                        //Lineracao de reservas para testes
+                        // Liberação temporária de reservas para testes
                         .requestMatchers(HttpMethod.POST, "/api/reservas").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/reservas/**").permitAll()
 
