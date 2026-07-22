@@ -17,7 +17,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 /**
  * Representa reservas diárias e vínculos administrativos de um espaço.
@@ -67,6 +70,18 @@ public class Reserva extends BaseEntity {
 
     @Column(name = "motivo_encerramento", length = 500)
     private String motivoEncerramento;
+
+    @Column(name = "area_m2_cobrada", precision = 10, scale = 2)
+    private BigDecimal areaM2Cobrada;
+
+    @Column(name = "tarifa_por_m2_aplicada", precision = 10, scale = 2)
+    private BigDecimal tarifaPorM2Aplicada;
+
+    @Column(name = "dias_uso")
+    private Integer diasUso;
+
+    @Column(name = "valor_taxa_solo", precision = 14, scale = 2)
+    private BigDecimal valorTaxaSolo;
 
     public static Reserva criarDiaria(
             Produtor produtor,
@@ -144,6 +159,7 @@ public class Reserva extends BaseEntity {
     public void encerrar(LocalDate dataEncerramento, String motivo) {
         this.dataEncerramento = dataEncerramento;
         this.motivoEncerramento = motivo;
+        calcularTaxaSolo(dataEncerramento);
         this.statusReserva = StatusReserva.ENCERRADA;
     }
 
@@ -155,6 +171,34 @@ public class Reserva extends BaseEntity {
         this.dataEncerramento = null;
         this.motivoEncerramento = motivo;
         this.statusReserva = StatusReserva.CANCELADA;
+    }
+
+    private void calcularTaxaSolo(LocalDate dataFimUso) {
+        if (espaco == null || espaco.getSecao() == null) {
+            return;
+        }
+
+        BigDecimal areaM2 = espaco.getAreaM2();
+        BigDecimal tarifaPorM2 = espaco.getSecao().getTaxaPorM2();
+
+        if (areaM2 == null || tarifaPorM2 == null) {
+            return;
+        }
+
+        int quantidadeDias = Math.toIntExact(
+                ChronoUnit.DAYS.between(dataInicio, dataFimUso) + 1
+        );
+
+        this.areaM2Cobrada = areaM2.setScale(2, RoundingMode.HALF_UP);
+        this.tarifaPorM2Aplicada = tarifaPorM2.setScale(
+                2,
+                RoundingMode.HALF_UP
+        );
+        this.diasUso = quantidadeDias;
+        this.valorTaxaSolo = areaM2
+                .multiply(tarifaPorM2)
+                .multiply(BigDecimal.valueOf(quantidadeDias))
+                .setScale(2, RoundingMode.HALF_UP);
     }
 
 }
