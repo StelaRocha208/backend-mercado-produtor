@@ -6,6 +6,7 @@ import br.com.mercadoprodutor.espacos.model.StatusOcupacao;
 import br.com.mercadoprodutor.espacos.model.TipoSecao;
 import br.com.mercadoprodutor.espacos.repository.EspacoRepository;
 import br.com.mercadoprodutor.reservas.model.StatusReserva;
+import br.com.mercadoprodutor.reservas.model.TipoReserva;
 import br.com.mercadoprodutor.reservas.repository.ReservaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,9 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Monta o mapa considerando reservas diárias e ocupações administrativas.
+ */
 @Service
 @RequiredArgsConstructor
 public class EspacoService {
@@ -32,10 +36,28 @@ public class EspacoService {
                 ? espacoRepository.findAllAtivosOrdenados()
                 : espacoRepository.findAtivosByTipoSecao(tipoSecao);
 
-        Set<String> espacosReservados = buscarEspacosReservados(dataInicio, dataFim);
+        LocalDate inicioConsulta = dataInicio == null
+                ? LocalDate.now()
+                : dataInicio;
+        LocalDate fimConsulta = dataFim == null ? inicioConsulta : dataFim;
+
+        Set<String> espacosReservados = buscarEspacosReservados(
+                inicioConsulta,
+                fimConsulta,
+                TipoReserva.reservasVolateis()
+        );
+        Set<String> espacosOcupados = buscarEspacosReservados(
+                inicioConsulta,
+                fimConsulta,
+                TipoReserva.ocupacoesFixas()
+        );
 
         return espacos.stream()
-                .map(espaco -> toResponse(espaco, espacosReservados))
+                .map(espaco -> toResponse(
+                        espaco,
+                        espacosReservados,
+                        espacosOcupados
+                ))
                 .toList();
     }
 
@@ -50,7 +72,8 @@ public class EspacoService {
 
     private Set<String> buscarEspacosReservados(
             LocalDate dataInicio,
-            LocalDate dataFim
+            LocalDate dataFim,
+            Set<TipoReserva> tiposReserva
     ) {
         if (dataInicio == null || dataFim == null) {
             return Set.of();
@@ -63,24 +86,35 @@ public class EspacoService {
         return reservaRepository.findEspacosReservadosNoPeriodo(
                 dataInicio,
                 dataFim,
-                StatusReserva.bloqueantes()
+                StatusReserva.bloqueantes(),
+                tiposReserva
         );
     }
 
     private EspacoResponse toResponse(
             Espaco espaco,
-            Set<String> espacosReservados
+            Set<String> espacosReservados,
+            Set<String> espacosOcupados
     ) {
         StatusOcupacao statusCalculado = calcularStatusOcupacao(
                 espaco,
-                espacosReservados
+                espacosReservados,
+                espacosOcupados
         );
 
         boolean selecionavel = Boolean.TRUE.equals(espaco.getAtivo())
                 && statusCalculado == StatusOcupacao.LIVRE
                 && secaoPermiteReserva(espaco.getSecao().getTipo());
+        boolean selecionavelAdministracao = Boolean.TRUE.equals(
+                espaco.getAtivo()
+        )
+                && statusCalculado == StatusOcupacao.LIVRE;
 
         String motivoBloqueio = obterMotivoBloqueio(espaco, statusCalculado);
+        String motivoBloqueioAdministracao = obterMotivoBloqueioAdministracao(
+                espaco,
+                statusCalculado
+        );
 
         return new EspacoResponse(
                 espaco.getId(),
@@ -97,14 +131,25 @@ public class EspacoService {
                 espaco.getColuna(),
                 espaco.getOrdemVisual(),
                 selecionavel,
-                motivoBloqueio
+                motivoBloqueio,
+                selecionavelAdministracao,
+                motivoBloqueioAdministracao
         );
     }
 
     private StatusOcupacao calcularStatusOcupacao(
             Espaco espaco,
-            Set<String> espacosReservados
+            Set<String> espacosReservados,
+            Set<String> espacosOcupados
     ) {
+        if (espaco.getStatusOcupacao() != StatusOcupacao.LIVRE) {
+            return espaco.getStatusOcupacao();
+        }
+
+        if (espacosOcupados.contains(espaco.getId())) {
+            return StatusOcupacao.OCUPADO;
+        }
+
         if (espacosReservados.contains(espaco.getId())) {
             return StatusOcupacao.RESERVADO;
         }
@@ -113,7 +158,7 @@ public class EspacoService {
     }
 
     private boolean secaoPermiteReserva(TipoSecao tipoSecao) {
-        return tipoSecao == TipoSecao.PEDRA || tipoSecao == TipoSecao.VOLANTE;
+        return tipoSecao == TipoSecao.VOLATIL;
     }
 
     private String obterMotivoBloqueio(
@@ -125,13 +170,29 @@ public class EspacoService {
         }
 
         if (!secaoPermiteReserva(espaco.getSecao().getTipo())) {
-            return "Esta seção não permite reserva antecipada";
+            return "A reserva diária está disponível apenas para espaços voláteis";
         }
 
         return switch (statusCalculado) {
             case LIVRE -> null;
             case RESERVADO -> "Espaço já reservado para o período informado";
             case OCUPADO -> "Espaço ocupado";
+            case INDISPONIVEL -> "Espaço indisponível";
+        };
+    }
+
+    private String obterMotivoBloqueioAdministracao(
+            Espaco espaco,
+            StatusOcupacao statusCalculado
+    ) {
+        if (!Boolean.TRUE.equals(espaco.getAtivo())) {
+            return "Espaço inativo";
+        }
+
+        return switch (statusCalculado) {
+            case LIVRE -> null;
+            case RESERVADO -> "Espaço reservado para o período informado";
+            case OCUPADO -> "Espaço ocupado no período informado";
             case INDISPONIVEL -> "Espaço indisponível";
         };
     }

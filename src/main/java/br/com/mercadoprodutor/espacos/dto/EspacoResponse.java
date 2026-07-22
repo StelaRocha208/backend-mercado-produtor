@@ -20,6 +20,8 @@ public record EspacoResponse(
         Integer coluna,
         Integer ordemVisual,
         Boolean selecionavel,
-        String motivoBloqueio
+        String motivoBloqueio,
+        Boolean selecionavelAdministracao,
+        String motivoBloqueioAdministracao
 ) {
 }
