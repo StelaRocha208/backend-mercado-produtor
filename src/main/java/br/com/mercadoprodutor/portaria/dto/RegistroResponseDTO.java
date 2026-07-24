@@ -42,10 +42,6 @@ public record RegistroResponseDTO(
                 registro.getVeiculo().getPlaca(),
                 registro.getTaxaVeiculo(),
 
-                registro.getReserva() != null ? registro.getReserva().getId() : null,
-                registro.getSecao(),
-                registro.getEspaco(),
-
                 registro.getDataEntrada(),
                 registro.getDataSaida(),
 
