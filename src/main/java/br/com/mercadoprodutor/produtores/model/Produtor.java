@@ -65,4 +65,25 @@ public class Produtor extends BaseEntity {
         veiculos.add(veiculo);
         veiculo.setProdutor(this);
     }
+
+    public void marcarComoInadimplente() {
+        this.inadimplente = true;
+    }
+
+
+    public void removerInadimplencia() {
+        this.inadimplente = false;
+        this.justificativaInadimplencia = null;
+    }
+
+
+    public void liberarEntradaExcepcional(String justificativa) {
+        this.liberacaoExcepcional = true;
+        this.justificativaInadimplencia = justificativa;
+    }
+
+
+    public void consumirLiberacaoExcepcional() {
+        this.liberacaoExcepcional = false;
+    }
 }

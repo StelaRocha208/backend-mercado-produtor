@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.math.BigDecimal;
 
 /**
  * Consulta reservas, conflitos de período e ocupações administrativas.
@@ -95,4 +96,38 @@ public interface ReservaRepository extends JpaRepository<Reserva, String> {
         where r.id = :id
     """)
     Optional<Reserva> findByIdComDetalhes(@Param("id") String id);
+
+    @Query("""
+    select coalesce(sum(r.valorTaxaSolo), 0)
+    from Reserva r
+    join r.produtor p
+    where p.inadimplente = true
+      and r.valorTaxaSolo is not null
+""")
+    BigDecimal calcularTotalEmAberto();
+
+
+    @Query("""
+        select count(distinct p.id)
+        from Reserva r
+        join r.produtor p
+        where p.inadimplente = true
+            and r.valorTaxaSolo is not null
+
+    """)
+    Long contarProdutoresInadimplentes();
+
+
+    @Query("""
+    select r
+    from Reserva r
+    join fetch r.produtor p
+    join fetch p.usuario
+    left join fetch r.espaco e
+    left join fetch e.secao
+    where p.inadimplente = true
+      and r.valorTaxaSolo is not null
+    order by p.usuario.nome, r.dataInicio desc
+""")
+    List<Reserva> findReservasProdutoresInadimplentes();
 }
