@@ -42,6 +42,7 @@ public class SecurityConfig {
                         
                         // LIBERAÇÃO TEMPORÁRIA DA PORTARIA
                         .requestMatchers(HttpMethod.GET, "/portaria/busca").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/relatorio/visitas").permitAll()
                         .requestMatchers(HttpMethod.POST, "/portaria/entrada").permitAll()
                         .requestMatchers(HttpMethod.POST, "/portaria/saida").permitAll()
                         .requestMatchers(HttpMethod.POST, "/portaria/liberar-acesso").permitAll()

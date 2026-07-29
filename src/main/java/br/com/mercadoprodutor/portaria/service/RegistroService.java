@@ -142,6 +142,28 @@ public class RegistroService implements IRegistroService {
         calcularTaxaVeiculo(veiculo.getTipo())
 );
 
+        if (dto.reservaId() != null && !dto.reservaId().isBlank()) {
+
+    Reserva reserva = reservaRepository.findById(dto.reservaId())
+            .orElseThrow(() ->
+                    new RegraNegocioException("Reserva não encontrada."));
+
+    if (!reserva.getProdutor().getId().equals(produtor.getId())) {
+        throw new RegraNegocioException(
+                "A reserva não pertence ao produtor informado.");
+    }
+
+    registro.setReserva(reserva);
+
+    registro.setSecao(
+            reserva.getEspaco().getSecao().getNome()
+    );
+
+    registro.setEspaco(
+            reserva.getEspaco().getNumero()
+    );
+}
+
         /*
          * Salva no histórico do registro
          */
