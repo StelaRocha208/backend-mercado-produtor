@@ -79,6 +79,12 @@ public class SecurityConfig {
                                 "/api/usuarios/*/detalhes"
                         ).permitAll()
 
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/relatorios/inadimplencia",
+                                "/relatorios/inadimplencia/resumo"
+                        ).permitAll()
+
                         // Qualquer outra rota precisa de token (ex: PUT, DELETE, Dashboard)
                         .anyRequest().authenticated()
                 )
