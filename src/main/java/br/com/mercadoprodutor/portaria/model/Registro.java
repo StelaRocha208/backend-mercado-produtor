@@ -3,8 +3,8 @@ package br.com.mercadoprodutor.portaria.model;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
 
-import jakarta.persistence.Column;
 import br.com.mercadoprodutor.core.model.BaseEntity;
+import br.com.mercadoprodutor.historico.model.StatusPagamento;
 import br.com.mercadoprodutor.produtores.model.Produtor;
 import br.com.mercadoprodutor.produtores.model.Veiculo;
 import br.com.mercadoprodutor.reservas.model.Reserva;
@@ -56,6 +56,13 @@ public class Registro extends BaseEntity {
 
     @Column(name = "taxa_veiculo", precision = 10, scale = 2)
     private BigDecimal taxaVeiculo;
+
+    @Column(name = "valor_cobrado", precision = 10, scale = 2)
+    private BigDecimal valorCobrado;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status_pagamento")
+    private StatusPagamento statusPagamento;
 
     /*
      * Liberação excepcional registrada no histórico da visita.
